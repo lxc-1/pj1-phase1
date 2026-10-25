@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "cli": "npm run build --silent && node dist/cli/main.js",
-    "test": "npm run build --silent && node --test dist/test/**/*.test.js",
-    "check": "npm run build && npm test"
+    "cli": "tsc -p tsconfig.json && node dist/cli/main.js",
+    "test": "tsc -p tsconfig.json && node --test dist/test/editor.commands.test.js dist/test/persistence.test.js",
+    "check": "tsc -p tsconfig.json && node --test dist/test/editor.commands.test.js dist/test/persistence.test.js"
   },
   "engines": {
     "node": ">=20"
