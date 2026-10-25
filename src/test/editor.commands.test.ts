@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { CommandDispatcher } from "../cli/CommandDispatcher.js";
 import { EditorSession } from "../application/EditorSession.js";
+import { FileGateway } from "../infrastructure/FileGateway.js";
 
 test("creates all built-in shape types and renders a useful tree", async () => {
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await dispatcher.dispatch("init 400 300");
   await dispatcher.dispatch("create g scene");
   await dispatcher.dispatch("create rect r1 10 20 100 50 #eee in scene");
@@ -24,7 +25,7 @@ test("creates all built-in shape types and renders a useful tree", async () => {
 });
 
 test("move, scale, set, undo and redo operate as command-sized units", async () => {
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await dispatcher.dispatch("init");
   await dispatcher.dispatch("create circle c1 50 60 10 red");
   await dispatcher.dispatch("move c1 5 -10");
@@ -40,7 +41,7 @@ test("move, scale, set, undo and redo operate as command-sized units", async () 
 });
 
 test("a failed edit is atomic and does not destroy redo history", async () => {
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await dispatcher.dispatch("init");
   await dispatcher.dispatch("create rect r1 1 2 3 4");
   await dispatcher.dispatch("move r1 10 0");
@@ -53,7 +54,7 @@ test("a failed edit is atomic and does not destroy redo history", async () => {
 });
 
 test("a successful edit after undo clears redo history", async () => {
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await dispatcher.dispatch("init");
   await dispatcher.dispatch("create rect r1 0 0 10 10");
   await dispatcher.dispatch("move r1 10 0");
@@ -63,7 +64,7 @@ test("a successful edit after undo clears redo history", async () => {
 });
 
 test("group, addto, z-order, delete and undo preserve hierarchy", async () => {
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await dispatcher.dispatch("init");
   await dispatcher.dispatch("create rect a 0 0 10 10");
   await dispatcher.dispatch("create rect b 20 0 10 10");
@@ -83,7 +84,7 @@ test("group, addto, z-order, delete and undo preserve hierarchy", async () => {
 });
 
 test("invalid ancestor grouping is rejected without changing the tree", async () => {
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await dispatcher.dispatch("init");
   await dispatcher.dispatch("create g outer");
   await dispatcher.dispatch("create g inner in outer");
@@ -98,7 +99,7 @@ test("invalid ancestor grouping is rejected without changing the tree", async ()
 });
 
 test("duplicate ids, bad containers and unknown attributes report specified errors", async () => {
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await assert.rejects(dispatcher.dispatch("tree"), /no document/);
   await dispatcher.dispatch("init");
   await dispatcher.dispatch("create rect r1 0 0 10 10");

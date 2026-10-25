@@ -5,6 +5,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { EditorSession } from "../application/EditorSession.js";
 import { CommandDispatcher } from "../cli/CommandDispatcher.js";
+import { FileGateway } from "../infrastructure/FileGateway.js";
 
 test("read assigns missing ids and save-read round trip preserves structure", async (context) => {
   const directory = await mkdtemp(join(tmpdir(), "svg-cli-"));
@@ -20,7 +21,7 @@ test("read assigns missing ids and save-read round trip preserves structure", as
     "</svg>",
   ].join("\n"), "utf8");
 
-  const session = new EditorSession();
+  const session = new EditorSession(new FileGateway());
   const messages = await session.read(sourcePath);
   assert.deepEqual(messages.slice(0, 2), [
     "warning: assigned id rect1 to unnamed <rect>",
@@ -35,7 +36,7 @@ test("read assigns missing ids and save-read round trip preserves structure", as
   assert.match(saved, /<circle id="circle1"/);
   assert.match(saved, />A &amp; B<\/text>/);
 
-  const reloaded = new EditorSession();
+  const reloaded = new EditorSession(new FileGateway());
   await reloaded.read(outputPath);
   assert.equal(reloaded.tree(), session.tree());
 });
@@ -44,7 +45,7 @@ test("IO commands establish undo boundaries until a new edit succeeds", async (c
   const directory = await mkdtemp(join(tmpdir(), "svg-cli-"));
   context.after(async () => rm(directory, { recursive: true, force: true }));
   const outputPath = join(directory, "saved.svg");
-  const dispatcher = new CommandDispatcher(new EditorSession());
+  const dispatcher = new CommandDispatcher(new EditorSession(new FileGateway()));
   await dispatcher.dispatch("init 100 80");
   await assert.rejects(dispatcher.dispatch("undo"), /undo not allowed after io command/);
   await dispatcher.dispatch("create rect r1 0 0 10 10");
@@ -58,7 +59,7 @@ test("IO commands establish undo boundaries until a new edit succeeds", async (c
 });
 
 test("read and save failures use stable error messages", async () => {
-  const session = new EditorSession();
+  const session = new EditorSession(new FileGateway());
   await assert.rejects(session.read("definitely-missing.svg"), /cannot read file: definitely-missing.svg/);
   session.init();
   await assert.rejects(session.save(), /no save path/);
@@ -69,5 +70,5 @@ test("duplicate ids in imported SVG are rejected", async (context) => {
   context.after(async () => rm(directory, { recursive: true, force: true }));
   const sourcePath = join(directory, "duplicate.svg");
   await writeFile(sourcePath, "<svg width=\"10\" height=\"10\"><rect id=\"same\" x=\"0\" y=\"0\" width=\"1\" height=\"1\"/><circle id=\"same\" cx=\"1\" cy=\"1\" r=\"1\"/></svg>", "utf8");
-  await assert.rejects(new EditorSession().read(sourcePath), /id already exists: same/);
+  await assert.rejects(new EditorSession(new FileGateway()).read(sourcePath), /id already exists: same/);
 });

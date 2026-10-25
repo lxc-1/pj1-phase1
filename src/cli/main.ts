@@ -2,9 +2,10 @@ import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { EditorSession } from "../application/EditorSession.js";
 import { EditorError } from "../domain/EditorError.js";
+import { FileGateway } from "../infrastructure/FileGateway.js";
 import { CommandDispatcher } from "./CommandDispatcher.js";
 
-const session = new EditorSession();
+const session = new EditorSession(new FileGateway());
 const dispatcher = new CommandDispatcher(session);
 const terminal = Boolean(input.isTTY && output.isTTY);
 const readline = createInterface({ input, output, terminal });

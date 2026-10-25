@@ -5,10 +5,10 @@ import { SvgDocument } from "../domain/SvgDocument.js";
 import { SvgParser } from "../domain/SvgParser.js";
 import { SvgSerializer } from "../domain/SvgSerializer.js";
 import { TreeRenderer } from "../domain/TreeRenderer.js";
-import { FileGateway } from "../infrastructure/FileGateway.js";
 import type { CommandContext } from "./CommandContext.js";
 import { CommandManager } from "./CommandManager.js";
 import type { EditingCommand } from "./commands/EditingCommand.js";
+import type { FilePort } from "./ports/FilePort.js";
 
 export class EditorSession implements CommandContext {
   private document: SvgDocument | null = null;
@@ -19,7 +19,7 @@ export class EditorSession implements CommandContext {
   private readonly showRenderer = new ShowRenderer();
   private readonly history = new CommandManager();
 
-  public constructor(private readonly files = new FileGateway()) {}
+  public constructor(private readonly files: FilePort) {}
 
   public init(width = 800, height = 600): string {
     this.document = new SvgDocument(width, height);
