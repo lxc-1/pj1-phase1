@@ -23,13 +23,13 @@ export class ShapeFactory {
 
   public fromSvg(type: string, id: string, attributes: Readonly<Record<string, string>>, text: string): Shape {
     const styles = this.stylesFrom(attributes);
-    const required = (name: string): string => { const value = attributes[name]; if (value === undefined) throw new EditorError("missing attribute " + name + " on <" + type + ">"); return value; };
+    const value = (name: string): string => attributes[name] ?? "0";
     switch (type) {
-      case "rect": return new RectShape(id, NumberValue.parse(required("x"), "x"), NumberValue.parse(required("y"), "y"), NumberValue.nonNegative(required("width"), "width"), NumberValue.nonNegative(required("height"), "height"), styles);
-      case "circle": return new CircleShape(id, NumberValue.parse(required("cx"), "cx"), NumberValue.parse(required("cy"), "cy"), NumberValue.nonNegative(required("r"), "r"), styles);
-      case "ellipse": return new EllipseShape(id, NumberValue.parse(required("cx"), "cx"), NumberValue.parse(required("cy"), "cy"), NumberValue.nonNegative(required("rx"), "rx"), NumberValue.nonNegative(required("ry"), "ry"), styles);
-      case "line": return new LineShape(id, NumberValue.parse(required("x1"), "x1"), NumberValue.parse(required("y1"), "y1"), NumberValue.parse(required("x2"), "x2"), NumberValue.parse(required("y2"), "y2"), styles);
-      case "text": return new TextShape(id, NumberValue.parse(required("x"), "x"), NumberValue.parse(required("y"), "y"), text, styles);
+      case "rect": return new RectShape(id, NumberValue.parse(value("x"), "x"), NumberValue.parse(value("y"), "y"), NumberValue.nonNegative(value("width"), "width"), NumberValue.nonNegative(value("height"), "height"), styles);
+      case "circle": return new CircleShape(id, NumberValue.parse(value("cx"), "cx"), NumberValue.parse(value("cy"), "cy"), NumberValue.nonNegative(value("r"), "r"), styles);
+      case "ellipse": return new EllipseShape(id, NumberValue.parse(value("cx"), "cx"), NumberValue.parse(value("cy"), "cy"), NumberValue.nonNegative(value("rx"), "rx"), NumberValue.nonNegative(value("ry"), "ry"), styles);
+      case "line": return new LineShape(id, NumberValue.parse(value("x1"), "x1"), NumberValue.parse(value("y1"), "y1"), NumberValue.parse(value("x2"), "x2"), NumberValue.parse(value("y2"), "y2"), styles);
+      case "text": return new TextShape(id, NumberValue.parse(value("x"), "x"), NumberValue.parse(value("y"), "y"), text, styles);
       case "g": return new GroupShape(id, styles);
       default: throw new EditorError("unsupported SVG element: " + type);
     }

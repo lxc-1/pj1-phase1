@@ -102,7 +102,7 @@ export class SvgParser {
   private toShape(node: ParsedElement, used: Set<string>, counters: Map<string, number>, warnings: string[]): Shape {
     if (!["rect", "circle", "ellipse", "line", "text", "g"].includes(node.tag)) throw new EditorError("unsupported SVG element: " + node.tag);
     const id = node.attributes.id ?? this.assignId(node.tag, used, counters, warnings);
-    const shape = this.factory.fromSvg(node.tag, id, node.attributes, XmlText.decode(node.text.trim()));
+    const shape = this.factory.fromSvg(node.tag, id, node.attributes, XmlText.decode(node.text));
     if (node.tag !== "g" && node.children.length > 0) throw new EditorError("unsupported nested content in <" + node.tag + ">");
     if (shape instanceof GroupShape) {
       for (const child of node.children) shape.insertChild(this.toShape(child, used, counters, warnings));
