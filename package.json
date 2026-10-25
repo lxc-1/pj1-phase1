@@ -1,0 +1,20 @@
+{
+  "name": "pj1-svg-cli-editor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A command-line SVG editor implemented with TypeScript, Command and Composite patterns.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "cli": "npm run build --silent && node dist/cli/main.js",
+    "test": "npm run build --silent && node --test dist/test/**/*.test.js",
+    "check": "npm run build && npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
